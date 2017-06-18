@@ -1,5 +1,6 @@
 package com.example.patrick.newsapplication;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,9 +45,9 @@ public class UIThread extends AppCompatActivity {
 
         if(itemNumber==R.id.search){
 
-//            String s=search.getText().toString();
-//            NetworkTask task=new NetworkTask(s);
-//            task.execute();
+            String s=search.getText().toString();
+            NetworkTask task=new NetworkTask(s);
+            task.execute();
             String textShow="Search Clicked";
             Toast.makeText(this,textShow, Toast.LENGTH_SHORT).show();
             return true;
@@ -61,6 +62,7 @@ public class UIThread extends AppCompatActivity {
         NetworkTask(String query){
             this.query=query;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -71,10 +73,10 @@ public class UIThread extends AppCompatActivity {
         @Override
         protected String doInBackground(URL... urls) {
             String result=null;
-            URL url=NetworkUtils.makeURL(query,"stars");
+            URL url=NetworkUtils.makeURL(getResources().getString(R.string.key),query,"");
             Log.d(TAG, "url: "+url.toString());
             try{
-                result=NetworkUtils.getResponsePromptUrl(url);
+                result=NetworkUtils.getResponseFromHttpUrl(url);
             }catch(IOException e){
                 e.printStackTrace();
             }
@@ -86,7 +88,7 @@ public class UIThread extends AppCompatActivity {
             super.onPostExecute(s);
             progress.setVisibility(View.GONE);
             if(s==null){
-                textView.setText("Sorry, no text was received");
+                textView.setText(s);
             }
             else{
                 textView.setText(s);

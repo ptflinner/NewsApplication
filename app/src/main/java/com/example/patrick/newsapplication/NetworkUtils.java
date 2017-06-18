@@ -1,5 +1,6 @@
 package com.example.patrick.newsapplication;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.util.Log;
@@ -18,17 +19,13 @@ import java.util.Scanner;
 public class NetworkUtils {
     private final static String TAG="Network Utils";
     private final static String NEWS_BASE_URL = "https://newsapi.org/v1/articles?source=the-next-web&sortBy=latest&apiKey=";
-    private final static String PARAM_QUERY ="q";
-    private final static String PARAM_SORT="sort";
+    private final static String PARAM_QUERY ="";
+    private final static String PARAM_SORT="";
 
-    public static URL makeURL(String searchQuery, String sortBy){
-        Resources res= Resources.getSystem();
-        String apiKey=res.getString(R.string.key);
+    public static URL makeURL(String key,String searchQuery, String sortBy){
 
-        Uri uri=Uri.parse(NEWS_BASE_URL).buildUpon()
-                .appendQueryParameter(apiKey,searchQuery)
-                .appendQueryParameter("",sortBy)
-                .build();
+        String apiBase=NEWS_BASE_URL+key;
+        Uri uri=Uri.parse(apiBase);
 
         URL url= null;
 
@@ -42,13 +39,15 @@ public class NetworkUtils {
         return url;
     }
 
-    public static String getResponsePromptUrl(URL url) throws IOException {
+    public static String getResponseFromHttpUrl(URL url) throws IOException{
         HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
         try{
             InputStream in=urlConnection.getInputStream();
             Scanner input=new Scanner(in);
 
             input.useDelimiter("\\A");
+            Log.d(TAG, "Input: "+input);
+
             return (input.hasNext())?input.next():null;}
         finally{
             urlConnection.disconnect();
