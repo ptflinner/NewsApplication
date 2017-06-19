@@ -13,14 +13,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.net.URL;
 
 public class UIThread extends AppCompatActivity {
 
-    private ProgressBar progress;
-    private EditText search;
-    private TextView textView;
+    private ProgressBar loadingProgressBar;
+    private EditText searchEditText;
+    private TextView JSONTextView;
+    private TextView errorTextView;
     private final static String TAG="Main Activity";
 
     @Override
@@ -28,9 +31,10 @@ public class UIThread extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uithread);
 
-        progress=(ProgressBar) findViewById(R.id.progressBar);
-        search=(EditText) findViewById(R.id.searchQuery);
-        textView=(TextView) findViewById(R.id.displayJSON);
+        loadingProgressBar=(ProgressBar) findViewById(R.id.pb_loading_indicator);
+        searchEditText=(EditText) findViewById(R.id.search_query);
+        JSONTextView=(TextView) findViewById(R.id.tv_search_results_json);
+        errorTextView=(TextView)findViewById(R.id.tv_error_message);
     }
 
     @Override
@@ -41,57 +45,61 @@ public class UIThread extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemNumber=item.getItemId();
-
-        if(itemNumber==R.id.search){
-
-            String s=search.getText().toString();
-            NetworkTask task=new NetworkTask(s);
-            task.execute();
-            String textShow="Search Clicked";
-            Toast.makeText(this,textShow, Toast.LENGTH_SHORT).show();
+        int itemThatWasClickedId = item.getItemId();
+        if (itemThatWasClickedId == R.id.search) {
+            makeNewsSearchQuery();
             return true;
         }
         return onOptionsItemSelected(item);
     }
 
+    private void makeNewsSearchQuery(){
+        String newsQuery=searchEditText.getText().toString();
+        URL newsSearchURL=NetworkUtils.buildUrl(getResources().getString(R.string.key));
+        new NetworkTask().execute(newsSearchURL);
+    }
 
+    private void showJSONResults(){
+        errorTextView.setVisibility(View.INVISIBLE);
+        JSONTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorMessage(){
+        errorTextView.setVisibility(View.VISIBLE);
+        JSONTextView.setVisibility(View.INVISIBLE);
+    }
     public class NetworkTask extends AsyncTask<URL,Void,String> {
-        String query;
-
-        NetworkTask(String query){
-            this.query=query;
-        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progress.setVisibility(View.VISIBLE);
-            query = search.getText().toString();
+            loadingProgressBar.setVisibility(View.INVISIBLE);
         }
 
         @Override
-        protected String doInBackground(URL... urls) {
+        protected String doInBackground(URL... param) {
             String result=null;
-            URL url=NetworkUtils.makeURL(getResources().getString(R.string.key),query,"");
+
+            URL url=param[0];
             Log.d(TAG, "url: "+url.toString());
             try{
                 result=NetworkUtils.getResponseFromHttpUrl(url);
             }catch(IOException e){
                 e.printStackTrace();
             }
-            return null;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            progress.setVisibility(View.GONE);
-            if(s==null){
-                textView.setText(s);
+        protected void onPostExecute(String returnedSearchResults) {
+            super.onPostExecute(returnedSearchResults);
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+            if(returnedSearchResults==null){
+                showErrorMessage();
             }
             else{
-                textView.setText(s);
+                showJSONResults();
+                JSONTextView.setText(returnedSearchResults);
             }
 
         }

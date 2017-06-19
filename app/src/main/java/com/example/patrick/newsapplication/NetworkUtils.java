@@ -22,34 +22,40 @@ public class NetworkUtils {
     private final static String PARAM_QUERY ="";
     private final static String PARAM_SORT="";
 
-    public static URL makeURL(String key,String searchQuery, String sortBy){
+    public static URL buildUrl(String key){
 
         String apiBase=NEWS_BASE_URL+key;
-        Uri uri=Uri.parse(apiBase);
+        Uri builtUri=Uri.parse(apiBase);
 
         URL url= null;
 
         try{
-            String urlString=uri.toString();
+            String urlString=builtUri.toString();
             Log.d(TAG, "Url: "+urlString);
-            url=new URL(uri.toString());
+            url=new URL(builtUri.toString());
+
         }catch (MalformedURLException e){
             e.printStackTrace();
+            return null;
         }
         return url;
     }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException{
         HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
-        try{
-            InputStream in=urlConnection.getInputStream();
-            Scanner input=new Scanner(in);
+        try {
+            InputStream in = urlConnection.getInputStream();
+            Scanner input = new Scanner(in);
 
             input.useDelimiter("\\A");
-            Log.d(TAG, "Input: "+input);
 
-            return (input.hasNext())?input.next():null;}
-        finally{
+            boolean hasInput = input.hasNext();
+            if (hasInput) {
+                return input.next();
+            } else {
+                return null;
+            }
+        }finally{
             urlConnection.disconnect();
         }
     }

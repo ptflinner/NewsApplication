@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">NewsApplication</string>
-    <string name="search_string"></string>
-    <string name="hint">Enter term</string>
+    <string name="app_name">News</string>
+    <string name="search">Search</string>
+    <string name="error_message">Failed to get results, please try again</string>
+    <string name="hint">Enter search term</string>
+    <string name="url_message">Your search URL will appear here</string>
 </resources>
