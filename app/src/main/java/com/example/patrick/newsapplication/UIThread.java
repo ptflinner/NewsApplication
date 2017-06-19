@@ -2,6 +2,7 @@ package com.example.patrick.newsapplication;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -55,8 +57,7 @@ public class UIThread extends AppCompatActivity {
 
     private void makeNewsSearchQuery(){
         String newsQuery=searchEditText.getText().toString();
-        URL newsSearchURL=NetworkUtils.buildUrl(getResources().getString(R.string.key));
-        new NetworkTask().execute(newsSearchURL);
+        new NetworkTask().execute("");
     }
 
     private void showJSONResults(){
@@ -68,7 +69,8 @@ public class UIThread extends AppCompatActivity {
         errorTextView.setVisibility(View.VISIBLE);
         JSONTextView.setVisibility(View.INVISIBLE);
     }
-    public class NetworkTask extends AsyncTask<URL,Void,String> {
+    public class NetworkTask extends AsyncTask<String,Void,String[]> {
+
 
         @Override
         protected void onPreExecute() {
@@ -77,21 +79,30 @@ public class UIThread extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(URL... param) {
+        protected String[] doInBackground(String... param) {
             String result=null;
 
-            URL url=param[0];
-            Log.d(TAG, "url: "+url.toString());
+            URL newsSearchURL=NetworkUtils.buildUrl(getResources().getString(R.string.key));
+            Log.d(TAG, "url: "+newsSearchURL.toString());
             try{
-                result=NetworkUtils.getResponseFromHttpUrl(url);
+                result=NetworkUtils.getResponseFromHttpUrl(newsSearchURL);
+
+                String jsonNewsData[]=NewsJsonUtils.getNewsStringFromJson(result);
+                return jsonNewsData;
             }catch(IOException e){
+                Log.d("UIThread","IO Exception Occurred");
                 e.printStackTrace();
+                return null;
             }
-            return result;
+            catch (JSONException e){
+                Log.d("UIThread","JSON Exception Occurred");
+                e.printStackTrace();
+                return null;
+            }
         }
 
         @Override
-        protected void onPostExecute(String returnedSearchResults) {
+        protected void onPostExecute(String[] returnedSearchResults) {
             super.onPostExecute(returnedSearchResults);
             loadingProgressBar.setVisibility(View.INVISIBLE);
             if(returnedSearchResults==null){
@@ -99,7 +110,9 @@ public class UIThread extends AppCompatActivity {
             }
             else{
                 showJSONResults();
-                JSONTextView.setText(returnedSearchResults);
+                for(String articleString:returnedSearchResults){
+                    JSONTextView.append((articleString+"\n\n\n"));
+                }
             }
 
         }
