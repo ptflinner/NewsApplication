@@ -75,7 +75,7 @@ public class UIThread extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingProgressBar.setVisibility(View.INVISIBLE);
+            loadingProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
