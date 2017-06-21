@@ -19,13 +19,14 @@ import java.util.Scanner;
 public class NetworkUtils {
     private final static String TAG="Network Utils";
     private final static String NEWS_BASE_URL = "https://newsapi.org/v1/articles?source=the-next-web&sortBy=latest&apiKey=";
-    private final static String PARAM_QUERY ="";
-    private final static String PARAM_SORT="";
+    private final static String PARAM_QUERY ="source";
+    private final static String PARAM_SORT="sortBy";
 
     public static URL buildUrl(String key){
 
         String apiBase=NEWS_BASE_URL+key;
-        Uri builtUri=Uri.parse(apiBase);
+        Uri builtUri=Uri.parse(apiBase).buildUpon().appendQueryParameter(PARAM_SORT,"latest")
+                .appendQueryParameter(PARAM_QUERY,"the-next-web").build();
 
         URL url= null;
 

@@ -1,8 +1,6 @@
 package com.example.patrick.newsapplication;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +10,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URL;
@@ -87,7 +83,7 @@ public class UIThread extends AppCompatActivity {
             try{
                 result=NetworkUtils.getResponseFromHttpUrl(newsSearchURL);
 
-                String jsonNewsData[]=NewsJsonUtils.getNewsStringFromJson(result);
+                String jsonNewsData[]= JsonUtils.getNewsStringFromJson(result);
                 return jsonNewsData;
             }catch(IOException e){
                 Log.d("UIThread","IO Exception Occurred");
