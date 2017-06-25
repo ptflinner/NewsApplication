@@ -22,6 +22,8 @@ public class NetworkUtils {
     private final static String PARAM_QUERY ="source";
     private final static String PARAM_SORT="sortBy";
 
+    //Builds the URL from various queries
+    //More queries will be added later possibly
     public static URL buildUrl(String key){
 
         String apiBase=NEWS_BASE_URL+key;
@@ -42,6 +44,7 @@ public class NetworkUtils {
         return url;
     }
 
+    //Receives the JSON from the server/URL request
     public static String getResponseFromHttpUrl(URL url) throws IOException{
         HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
         try {

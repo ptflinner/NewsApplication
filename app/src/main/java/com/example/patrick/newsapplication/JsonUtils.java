@@ -23,6 +23,7 @@ public class JsonUtils {
     private final static String RN_IMAGE_URL="urlToImage";
     private final static String RN_PUBLISH="publishedAt";
 
+    //Parses the returned json to a string array
     public static String[] getNewsStringFromJson(String newsJsonString)throws JSONException{
         String parsedNewsInformation[]=null;
         JSONObject newsJson=new JSONObject(newsJsonString);
@@ -43,6 +44,7 @@ public class JsonUtils {
         return parsedNewsInformation;
     }
 
+    //Parses the returned json to an Article object
     public static ArrayList<Article> getArticleFromJson(String newsJsonString) throws JSONException{
         ArrayList<Article> articleArray=new ArrayList<>();
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class DisplayUtils {
-    public String[] returnAuthors(ArrayList<Article> articles){
+    public static String[] returnAuthors(ArrayList<Article> articles){
         String[] articleArray=new String[articles.size()];
 
         for(int i=0;i<articles.size();i++){
@@ -18,7 +18,7 @@ public class DisplayUtils {
         return articleArray;
     }
 
-    public String[] returnTitles(ArrayList<Article> articles){
+    public static String[] returnTitles(ArrayList<Article> articles){
         String[] articleArray=new String[articles.size()];
 
         for(int i=0;i<articles.size();i++){
@@ -29,7 +29,7 @@ public class DisplayUtils {
         return articleArray;
     }
 
-    public String[] returnAuthorsTitles(ArrayList<Article> articles){
+    public static String[] returnAuthorsTitles(ArrayList<Article> articles){
         String[] articleArray=new String[articles.size()];
 
         for(int i=0;i<articles.size();i++){
@@ -40,7 +40,7 @@ public class DisplayUtils {
         return articleArray;
     }
 
-    public String[] returnAuthorsTitlesDescriptions(ArrayList<Article> articles){
+    public static String[] returnAuthorsTitlesDescriptions(ArrayList<Article> articles){
         String[] articleArray=new String[articles.size()];
 
         for(int i=0;i<articles.size();i++){
