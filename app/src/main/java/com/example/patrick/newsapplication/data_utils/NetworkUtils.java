@@ -1,4 +1,4 @@
-package com.example.patrick.newsapplication;
+package com.example.patrick.newsapplication.data_utils;
 
 import android.content.Context;
 import android.content.res.Resources;

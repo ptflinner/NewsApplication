@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import com.example.patrick.newsapplication.data_utils.*;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class MainThread extends AppCompatActivity {
     }
 
     //Class that is used for calls that can't be done on the UIThread
-    public class NetworkTask extends AsyncTask<String,Void,ArrayList<Article>> {
+    public class NetworkTask extends AsyncTask<String,Void,ArrayList<NewsItem>> {
 
 
         //Turns the progress bar twirl on
@@ -102,7 +102,7 @@ public class MainThread extends AppCompatActivity {
 
         //Makes calls to the network class to build the URL and subsequently have it retrieve information
         @Override
-        protected ArrayList<Article> doInBackground(String... param) {
+        protected ArrayList<NewsItem> doInBackground(String... param) {
             String result=null;
 
             URL newsSearchURL=NetworkUtils.buildUrl(getResources().getString(R.string.key));
@@ -113,9 +113,9 @@ public class MainThread extends AppCompatActivity {
                 result=NetworkUtils.getResponseFromHttpUrl(newsSearchURL);
 
                 //Creates the article list
-                ArrayList<Article> articleList=JsonUtils.getArticleFromJson(result);
+                ArrayList<NewsItem> newsItemList =JsonUtils.getArticleFromJson(result);
 
-                return articleList;
+                return newsItemList;
 
             }catch(IOException e){
                 Log.d("MainThread","IO Exception Occurred");
@@ -133,7 +133,7 @@ public class MainThread extends AppCompatActivity {
         //Turns off the progress twirl
         //Displays the info into a clickable piece from the adapter
         @Override
-        protected void onPostExecute(final ArrayList<Article> returnedSearchResults) {
+        protected void onPostExecute(final ArrayList<NewsItem> returnedSearchResults) {
             super.onPostExecute(returnedSearchResults);
             loadingProgressBar.setVisibility(View.INVISIBLE);
             if(returnedSearchResults==null){

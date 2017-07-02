@@ -4,7 +4,7 @@ package com.example.patrick.newsapplication;
  * Created by Patrick on 6/21/2017.
  */
 
-public class Article {
+public class NewsItem {
     String articleTitle;
     String articleDescription;
     String articleAuthor;
@@ -12,7 +12,7 @@ public class Article {
     String articleImage;
     String articlePublishDate;
 
-    public Article(){
+    public NewsItem(){
         this.articleTitle = "";
         this.articleDescription = "";
         this.articleAuthor = "";
@@ -20,8 +20,8 @@ public class Article {
         this.articleImage = "";
         this.articlePublishDate = "";
     }
-    public Article(String articleTitle, String articleDescription,
-                   String articleAuthor, String articleUrl, String articleImage, String articlePublishDate) {
+    public NewsItem(String articleTitle, String articleDescription,
+                    String articleAuthor, String articleUrl, String articleImage, String articlePublishDate) {
         this.articleTitle = articleTitle;
         this.articleDescription = articleDescription;
         this.articleAuthor = articleAuthor;

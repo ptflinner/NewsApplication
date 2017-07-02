@@ -1,6 +1,6 @@
-package com.example.patrick.newsapplication;
+package com.example.patrick.newsapplication.data_utils;
 
-import android.content.Context;
+import com.example.patrick.newsapplication.NewsItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,9 +44,9 @@ public class JsonUtils {
         return parsedNewsInformation;
     }
 
-    //Parses the returned json to an Article object
-    public static ArrayList<Article> getArticleFromJson(String newsJsonString) throws JSONException{
-        ArrayList<Article> articleArray=new ArrayList<>();
+    //Parses the returned json to an NewsItem object
+    public static ArrayList<NewsItem> getArticleFromJson(String newsJsonString) throws JSONException{
+        ArrayList<NewsItem> newsItemArray =new ArrayList<>();
 
         JSONObject newsJSON=new JSONObject(newsJsonString);
         JSONArray newsArray=newsJSON.getJSONArray(RN_ARTICLE);
@@ -61,9 +61,9 @@ public class JsonUtils {
             String articleImage=newsArticles.getString(RN_IMAGE_URL);
             String articlePublished=newsArticles.getString(RN_PUBLISH);
 
-            articleArray.add(new Article(articleTitle,articleDescription,
+            newsItemArray.add(new NewsItem(articleTitle,articleDescription,
                     articleAuthor,articleUrl,articleImage,articlePublished));
         }
-        return articleArray;
+        return newsItemArray;
     }
 }

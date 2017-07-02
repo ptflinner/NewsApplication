@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleAdapterItemHolder>{
 
-    ArrayList<Article> articleData;
+    ArrayList<NewsItem> newsItemData;
     ItemClickListener listener;
 
     //Various constructors for the Adapter
@@ -23,8 +23,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
 
     }
 
-    public ArticleAdapter(ArrayList<Article> articleData,ItemClickListener listener){
-        this.articleData=articleData;
+    public ArticleAdapter(ArrayList<NewsItem> newsItemData, ItemClickListener listener){
+        this.newsItemData = newsItemData;
         this.listener=listener;
     }
 
@@ -54,10 +54,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
         //Sets what goes into the views
         //Gets info from the article arraylist
         public void bind(int position){
-            Article article=articleData.get(position);
-            articleTitleTextView.setText(article.getArticleTitle());
-            articleAuthorTextView.setText(article.getArticleAuthor());
-            articleDateTextView.setText(article.getArticlePublishDate());
+            NewsItem newsItem = newsItemData.get(position);
+            articleTitleTextView.setText(newsItem.getArticleTitle());
+            articleAuthorTextView.setText(newsItem.getArticleAuthor());
+            articleDateTextView.setText(newsItem.getArticlePublishDate());
 
         }
 
@@ -92,19 +92,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
     //Number of items to display
     @Override
     public int getItemCount() {
-        if(articleData==null){
+        if(newsItemData ==null){
             return 0;
         }
         else{
-            return articleData.size();
+            return newsItemData.size();
         }
     }
 
     //Not Used
     //Was initially for saying if data was changed
     //And not creating unneeded viewholders
-    public void setArticleData(ArrayList<Article> articles){
-        articleData=new ArrayList<>(articles);
+    public void setNewsItemData(ArrayList<NewsItem> newsItems){
+        newsItemData =new ArrayList<>(newsItems);
         notifyDataSetChanged();
     }
 }
