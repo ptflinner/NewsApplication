@@ -1,7 +1,6 @@
 package com.example.patrick.newsapplication.data_utils;
 
 import java.util.ArrayList;
-import com.example.patrick.newsapplication.NewsItem;
 
 /**
  * Created by Patrick on 6/21/2017.

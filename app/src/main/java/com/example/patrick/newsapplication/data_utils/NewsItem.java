@@ -1,4 +1,4 @@
-package com.example.patrick.newsapplication;
+package com.example.patrick.newsapplication.data_utils;
 
 /**
  * Created by Patrick on 6/21/2017.

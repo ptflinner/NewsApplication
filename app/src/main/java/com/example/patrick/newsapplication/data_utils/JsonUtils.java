@@ -1,7 +1,5 @@
 package com.example.patrick.newsapplication.data_utils;
 
-import com.example.patrick.newsapplication.NewsItem;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
