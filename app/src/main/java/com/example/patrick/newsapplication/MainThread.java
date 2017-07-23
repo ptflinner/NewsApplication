@@ -1,8 +1,14 @@
 package com.example.patrick.newsapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,40 +17,42 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.patrick.newsapplication.data_models.*;
-import com.example.patrick.newsapplication.utils.JsonUtils;
-import com.example.patrick.newsapplication.utils.NetworkUtils;
+import com.example.patrick.newsapplication.database_classes.Contract;
+import com.example.patrick.newsapplication.database_classes.DBHelper;
+import com.example.patrick.newsapplication.database_classes.DBUtils;
+import com.example.patrick.newsapplication.jobs.SchedulerUtil;
 
-import org.json.JSONException;
+import com.example.patrick.newsapplication.utils.RefreshUtil;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-
-public class MainThread extends AppCompatActivity {
+public class MainThread extends AppCompatActivity  implements LoaderManager.LoaderCallbacks<Void>,ArticleAdapter.ItemClickListener{
 
     //Various views that need to be handled
     private ProgressBar loadingProgressBar;
-    private EditText searchEditText;
     private RecyclerView jsonRecyclerView;
     private TextView errorTextView;
     private ArticleAdapter articleAdapter;
+    private Cursor cursor;
+    private SQLiteDatabase db;
     public final static String URLKEY="url";
 
     private final static String TAG="Main Activity";
+    private final static int NEWS_LOADER=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uithread);
 
+        //Sets up the shared preferences
+        //Used to check if first time setup has been run
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFirst=prefs.getBoolean("isFirst",true);
+
         //Initializes the views
         loadingProgressBar=(ProgressBar) findViewById(R.id.pb_loading_indicator);
-        searchEditText=(EditText) findViewById(R.id.search_query);
         jsonRecyclerView=(RecyclerView) findViewById(R.id.news_recycler_view);
         errorTextView=(TextView)findViewById(R.id.tv_error_message);
 
@@ -52,9 +60,40 @@ public class MainThread extends AppCompatActivity {
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         jsonRecyclerView.setLayoutManager(layoutManager);
         jsonRecyclerView.setHasFixedSize(true);
+        articleAdapter=new ArticleAdapter(cursor,MainThread.this);
 
-        articleAdapter=new ArticleAdapter();
+        //Checks if it is the first time being run on the phone
+        //This is done through the sharedpreference isfirst check
+        //done earlier
+        if(isFirst){
+            load();
+            SharedPreferences.Editor editor=prefs.edit();
+            editor.putBoolean("isFirst",false);
+            editor.commit();
+        }
+
+        //Begins the scheduling of the
+        SchedulerUtil.scheduleRefresh(this);
+    }
+
+    //When the app starts the database is called upon
+    //The cursor gets the required info and sends it to the adapter
+    @Override
+    protected void onStart() {
+        super.onStart();
+        db=new DBHelper(MainThread.this).getReadableDatabase();
+        cursor= DBUtils.getAll(db);
+        articleAdapter=new ArticleAdapter(cursor,this);
         jsonRecyclerView.setAdapter(articleAdapter);
+    }
+
+    //Everyting is closed when the app is closed
+    //No memory problems occur this way
+    @Override
+    protected void onStop() {
+        super.onStop();
+        db.close();
+        cursor.close();
     }
 
     //Creates the options menu in the top right
@@ -69,17 +108,11 @@ public class MainThread extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemThatWasClickedId = item.getItemId();
         if (itemThatWasClickedId == R.id.search) {
-            makeNewsSearchQuery();
-            return true;
+            load();
         }
-        return onOptionsItemSelected(item);
+        return true;
     }
 
-    //Triggers to call to the API and sets everything into motion
-    private void makeNewsSearchQuery(){
-        String newsQuery=searchEditText.getText().toString();
-        new NetworkTask().execute(newsQuery);
-    }
 
     //Next two functions display the correct pieces
     //or an error message if something went wrong
@@ -93,83 +126,60 @@ public class MainThread extends AppCompatActivity {
         jsonRecyclerView.setVisibility(View.INVISIBLE);
     }
 
-    //Class that is used for calls that can't be done on the UIThread
-    public class NetworkTask extends AsyncTask<String,Void,ArrayList<NewsItem>> {
+    //Creates and returns a new loader
+    @Override
+    public Loader<Void> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Void>(this) {
 
+            //
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                loadingProgressBar.setVisibility(View.VISIBLE);
+            }
 
-        //Turns the progress bar twirl on
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            loadingProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        //Makes calls to the network class to build the URL and subsequently have it retrieve information
-        @Override
-        protected ArrayList<NewsItem> doInBackground(String... param) {
-            String result=null;
-
-            URL newsSearchURL= NetworkUtils.buildUrl(getResources().getString(R.string.key));
-            Log.d(TAG, "url: "+newsSearchURL.toString());
-            try{
-                //Retrieves information from the url
-                //Comes in the form of JSON
-                result=NetworkUtils.getResponseFromHttpUrl(newsSearchURL);
-
-                //Creates the article list
-                ArrayList<NewsItem> newsItemList = JsonUtils.getArticleFromJson(result);
-
-                return newsItemList;
-
-            }catch(IOException e){
-                Log.d("MainThread","IO Exception Occurred");
-                e.printStackTrace();
+            @Override
+            public Void loadInBackground() {
+                RefreshUtil.refreshArticles(MainThread.this);
                 return null;
             }
-            catch (JSONException e){
-                Log.d("MainThread","JSON Exception Occurred");
-                e.printStackTrace();
-                return null;
-            }
-        }
+        };
+    }
 
-        //Begins flipping the switches to display the new information
-        //Turns off the progress twirl
-        //Displays the info into a clickable piece from the adapter
-        @Override
-        protected void onPostExecute(final ArrayList<NewsItem> returnedSearchResults) {
-            super.onPostExecute(returnedSearchResults);
-            loadingProgressBar.setVisibility(View.INVISIBLE);
-            if(returnedSearchResults==null){
-                showErrorMessage();
-            }
-            else{
-                showJSONResults();
-                ArticleAdapter adapter=new ArticleAdapter(returnedSearchResults,new ArticleAdapter.ItemClickListener(){
+    //When previous loader is finished
+    //it draws info from the database and sends it to the adapter
+    @Override
+    public void onLoadFinished(Loader<Void> loader, Void data) {
+        loadingProgressBar.setVisibility(View.GONE);
+        db=new DBHelper(MainThread.this).getReadableDatabase();
+        cursor=DBUtils.getAll(db);
 
-                    @Override
-                    public void onItemClick(int clickedItemIndex) {
-                        String url = returnedSearchResults.get(clickedItemIndex).getArticleUrl();
-                        Log.d(TAG, String.format("Url %s", url));
-                        openWebPage(url);
+        articleAdapter=new ArticleAdapter(cursor,MainThread.this);
+        jsonRecyclerView.setAdapter(articleAdapter);
+        articleAdapter.notifyDataSetChanged();
+    }
 
-                        //This commented out piece allows for the url to open in app and not in browser
-//                        Intent intent = new Intent(MainThread.this, WebActivity.class);
-//                        intent.putExtra(URLKEY, url);
-//                        startActivity(intent);
-                    }
-                });
-                jsonRecyclerView.setAdapter(adapter);
-            }
-        }
+    //Previous loader is reset
+    @Override
+    public void onLoaderReset(Loader<Void> loader) {
+    }
 
-        //Opens up a browser on the phone to display the news article
-        public void openWebPage(String url) {
-            Uri webpage = Uri.parse(url);
-            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-            }
-        }
+    //When an item is clicked a webpage is opened in the users preferred browser
+    @Override
+    public void onItemClick(int clickedItemIndex) {
+        cursor.moveToPosition(clickedItemIndex);
+        String url=cursor.getString(cursor.getColumnIndex(Contract.TABLE_ARTICLES.COLUMN_NAME_WEB_URL));
+        Log.d(TAG,"URL: "+url);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
+    }
+
+    //Creates the loader manager and begins loading info
+    //Loader manager helps manage one or more loaders
+    private void load(){
+        LoaderManager loaderManager=getSupportLoaderManager();
+        loaderManager.restartLoader(NEWS_LOADER,null,this).forceLoad();
     }
 }

@@ -3,6 +3,7 @@ package com.example.patrick.newsapplication.database_classes;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by Patrick on 7/22/2017.
@@ -19,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper{
 
     //Creates the database
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+    public void onCreate(SQLiteDatabase db) {
         String queryString="CREATE TABLE " + Contract.TABLE_ARTICLES.TABLE_NAME+ " ("+
                 Contract.TABLE_ARTICLES._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 Contract.TABLE_ARTICLES.COLUMN_NAME_TITLE+" TEXT NOT NULL, "+
@@ -29,6 +30,9 @@ public class DBHelper extends SQLiteOpenHelper{
                 Contract.TABLE_ARTICLES.COLUMN_NAME_IMG_URL+" TEXT NOT NULL, "+
                 Contract.TABLE_ARTICLES.COLUMN_NAME_PUBLISHED+" DATE "+
                 "); ";
+
+        Log.d(TAG,"Created Table: "+queryString);
+        db.execSQL(queryString);
     }
 
     //Used for when the database is updated

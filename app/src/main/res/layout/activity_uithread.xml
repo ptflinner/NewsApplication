@@ -6,16 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.patrick.newsapplication.MainThread">
-
-    <EditText
-        android:id="@+id/search_query"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/hint"
-        android:textSize="18sp"
-        android:maxLines="1"
-        android:visibility="invisible"/>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

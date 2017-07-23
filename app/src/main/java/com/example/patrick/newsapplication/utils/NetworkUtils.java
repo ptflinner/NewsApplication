@@ -27,8 +27,7 @@ public class NetworkUtils {
     public static URL buildUrl(String key){
 
         String apiBase=NEWS_BASE_URL+key;
-        Uri builtUri=Uri.parse(apiBase).buildUpon().appendQueryParameter(PARAM_SORT,"latest")
-                .appendQueryParameter(PARAM_QUERY,"the-next-web").build();
+        Uri builtUri=Uri.parse(apiBase);
 
         URL url= null;
 

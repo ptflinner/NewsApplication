@@ -29,7 +29,7 @@ public class DBUtils {
                 null,
                 null,
                 null,
-                COLUMN_NAME_PUBLISHED);
+                COLUMN_NAME_PUBLISHED + " DESC");
         return cursor;
     }
 
@@ -41,16 +41,16 @@ public class DBUtils {
         try{
             for(NewsItem item: articles){
                 ContentValues cv=new ContentValues();
-                cv.put(COLUMN_NAME_AUTHOR,item.getArticleAuthor());
                 cv.put(COLUMN_NAME_TITLE,item.getArticleTitle());
+                cv.put(COLUMN_NAME_AUTHOR,item.getArticleAuthor());
                 cv.put(COLUMN_NAME_DESCRIPTION,item.getArticleDescription());
                 cv.put(COLUMN_NAME_WEB_URL,item.getArticleUrl());
                 cv.put(COLUMN_NAME_IMG_URL,item.getArticleImage());
                 cv.put(COLUMN_NAME_PUBLISHED,item.getArticlePublishDate());
+                db.insert(TABLE_NAME,null,cv);
             }
             db.setTransactionSuccessful();
         }catch(Exception e){
-            Log.d(TAG,"SQL Exception Has OCcurred");
             Thread.currentThread().getStackTrace();
         }
         finally{

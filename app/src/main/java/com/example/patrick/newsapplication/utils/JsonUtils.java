@@ -1,5 +1,7 @@
 package com.example.patrick.newsapplication.utils;
 
+import android.util.Log;
+
 import com.example.patrick.newsapplication.data_models.NewsItem;
 
 import org.json.JSONArray;
@@ -22,6 +24,7 @@ public class JsonUtils {
     private final static String RN_URL="url";
     private final static String RN_IMAGE_URL="urlToImage";
     private final static String RN_PUBLISH="publishedAt";
+    private final static String TAG="JsonUtils";
 
     //Parses the returned json to a string array
     public static String[] getNewsStringFromJson(String newsJsonString)throws JSONException{
@@ -60,6 +63,7 @@ public class JsonUtils {
             String articleUrl=newsArticles.getString(RN_URL);
             String articleImage=newsArticles.getString(RN_IMAGE_URL);
             String articlePublished=newsArticles.getString(RN_PUBLISH);
+            articlePublished=articlePublished.substring(0,10);
 
             newsItemArray.add(new NewsItem(articleTitle,articleDescription,
                     articleAuthor,articleUrl,articleImage,articlePublished));

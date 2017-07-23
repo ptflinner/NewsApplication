@@ -76,7 +76,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
 
         //Five fields that need to be displayed
         private final TextView articleTitleTextView;
-        private final TextView articleAuthorTextView;
         private final TextView articleDateTextView;
         private final TextView articleDescriptionTextView;
         private final ImageView articleImageImageView;
@@ -86,7 +85,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
         public ArticleAdapterItemHolder(View itemView) {
             super(itemView);
             articleTitleTextView=(TextView) itemView.findViewById(R.id.news_title_text_view);
-            articleAuthorTextView=(TextView) itemView.findViewById(R.id.news_author_text_view);
             articleDateTextView=(TextView) itemView.findViewById(R.id.news_date_text_view);
             articleDescriptionTextView=(TextView) itemView.findViewById(R.id.news_description_text_view);
             articleImageImageView=(ImageView) itemView.findViewById(R.id.image_image_view);
@@ -96,11 +94,14 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
         //Sets what goes into the views
         //Gets info from the cursor, which gets info from the database
         public void bind(int position){
+
             cursor.moveToPosition(position);
+
             articleTitleTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TITLE)));
-            articleAuthorTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_AUTHOR)));
+            articleDescriptionTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
             articleDateTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PUBLISHED)));
             String imgUrl=cursor.getString(cursor.getColumnIndex(COLUMN_NAME_IMG_URL));
+
             if(imgUrl != null){
                 Picasso.with(context).load(imgUrl).into(articleImageImageView);
             }
