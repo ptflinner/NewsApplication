@@ -1,4 +1,4 @@
-package com.example.patrick.newsapplication.data_utils;
+package com.example.patrick.newsapplication.database_classes;
 
 import android.provider.BaseColumns;
 
@@ -6,6 +6,7 @@ import android.provider.BaseColumns;
  * Created by Patrick on 7/22/2017.
  */
 
+//Allows for easy database name calls. Harder to make errors if names can be called
 public class Contract {
     public static class TABLE_ARTICLES implements BaseColumns{
         public static final String TABLE_NAME="articles";

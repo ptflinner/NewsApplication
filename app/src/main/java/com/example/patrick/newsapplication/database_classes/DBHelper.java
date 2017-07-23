@@ -1,4 +1,4 @@
-package com.example.patrick.newsapplication.data_utils;
+package com.example.patrick.newsapplication.database_classes;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,9 +17,10 @@ public class DBHelper extends SQLiteOpenHelper{
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    //Creates the database
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String queryString="CREATE TABLE " +Contract.TABLE_ARTICLES.TABLE_NAME+ " ("+
+        String queryString="CREATE TABLE " + Contract.TABLE_ARTICLES.TABLE_NAME+ " ("+
                 Contract.TABLE_ARTICLES._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 Contract.TABLE_ARTICLES.COLUMN_NAME_TITLE+" TEXT NOT NULL, "+
                 Contract.TABLE_ARTICLES.COLUMN_NAME_AUTHOR+" TEXT NOT NULL, "+
@@ -30,6 +31,7 @@ public class DBHelper extends SQLiteOpenHelper{
                 "); ";
     }
 
+    //Used for when the database is updated
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE "+Contract.TABLE_ARTICLES.TABLE_NAME+" if exists;");

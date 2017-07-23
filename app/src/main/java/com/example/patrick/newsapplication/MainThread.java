@@ -14,7 +14,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.example.patrick.newsapplication.data_utils.*;
+
+import com.example.patrick.newsapplication.data_models.*;
+import com.example.patrick.newsapplication.utils.JsonUtils;
+import com.example.patrick.newsapplication.utils.NetworkUtils;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -105,7 +109,7 @@ public class MainThread extends AppCompatActivity {
         protected ArrayList<NewsItem> doInBackground(String... param) {
             String result=null;
 
-            URL newsSearchURL=NetworkUtils.buildUrl(getResources().getString(R.string.key));
+            URL newsSearchURL= NetworkUtils.buildUrl(getResources().getString(R.string.key));
             Log.d(TAG, "url: "+newsSearchURL.toString());
             try{
                 //Retrieves information from the url
@@ -113,7 +117,7 @@ public class MainThread extends AppCompatActivity {
                 result=NetworkUtils.getResponseFromHttpUrl(newsSearchURL);
 
                 //Creates the article list
-                ArrayList<NewsItem> newsItemList =JsonUtils.getArticleFromJson(result);
+                ArrayList<NewsItem> newsItemList = JsonUtils.getArticleFromJson(result);
 
                 return newsItemList;
 

@@ -1,15 +1,17 @@
 package com.example.patrick.newsapplication;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.patrick.newsapplication.data_utils.NewsItem;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import static com.example.patrick.newsapplication.database_classes.Contract.TABLE_ARTICLES.*;
 
 /**
  * Created by Patrick on 6/21/2017.
@@ -17,16 +19,17 @@ import java.util.ArrayList;
 
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleAdapterItemHolder>{
 
-    ArrayList<NewsItem> newsItemData;
-    ItemClickListener listener;
+    private Cursor cursor;
+    private ItemClickListener listener;
+    private Context context;
 
     //Various constructors for the Adapter
-    public ArticleAdapter(){
+    private ArticleAdapter(){
 
     }
 
-    public ArticleAdapter(ArrayList<NewsItem> newsItemData, ItemClickListener listener){
-        this.newsItemData = newsItemData;
+    public ArticleAdapter(Cursor cursor, ItemClickListener listener){
+        this.cursor=cursor;
         this.listener=listener;
     }
 
@@ -35,48 +38,13 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
         void onItemClick(int clickedItemIndex);
     }
 
-    //Itemholder that holds the items to enable separate pieces
-    public class ArticleAdapterItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
-        //Three fields that need to be displayed
-        public final TextView articleTitleTextView;
-        public final TextView articleAuthorTextView;
-        public final TextView articleDateTextView;
-
-        //Constructor for the initialization of the above pieces
-        //A click listener is used to track the clicks
-        public ArticleAdapterItemHolder(View itemView) {
-            super(itemView);
-            articleTitleTextView=(TextView) itemView.findViewById(R.id.news_title_text_view);
-            articleAuthorTextView=(TextView) itemView.findViewById(R.id.news_author_text_view);
-            articleDateTextView=(TextView) itemView.findViewById(R.id.news_date_text_view);
-            itemView.setOnClickListener(this);
-        }
-
-        //Sets what goes into the views
-        //Gets info from the article arraylist
-        public void bind(int position){
-            NewsItem newsItem = newsItemData.get(position);
-            articleTitleTextView.setText(newsItem.getArticleTitle());
-            articleAuthorTextView.setText(newsItem.getArticleAuthor());
-            articleDateTextView.setText(newsItem.getArticlePublishDate());
-
-        }
-
-        //Gets the location of the item that was clicked to return the correct info
-        @Override
-        public void onClick(View view) {
-            int pos=getAdapterPosition();
-            listener.onItemClick(pos);
-        }
-    }
-
     //Creates viewholders for all the pieces
     //Allows for scrolling to occur
     @Override
     public ArticleAdapterItemHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context=viewGroup.getContext();
-        int layoutId=R.layout.news_article_items;
+        this.context=viewGroup.getContext();
+        int layoutId= R.layout.news_article_items;
+
         LayoutInflater inflater=LayoutInflater.from(context);
         boolean shouldAttachToParent=false;
 
@@ -94,19 +62,55 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleA
     //Number of items to display
     @Override
     public int getItemCount() {
-        if(newsItemData ==null){
-            return 0;
-        }
-        else{
-            return newsItemData.size();
-        }
+        return cursor.getCount();
     }
 
-    //Not Used
-    //Was initially for saying if data was changed
-    //And not creating unneeded viewholders
-    public void setNewsItemData(ArrayList<NewsItem> newsItems){
-        newsItemData =new ArrayList<>(newsItems);
-        notifyDataSetChanged();
+    /****************************************************************************************************/
+    /****************************************************************************************************/
+    /****************************************************************************************************/
+    /****************************************************************************************************/
+    /****************************************************************************************************/
+
+    //Itemholder that holds the items to enable separate pieces
+    public class ArticleAdapterItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        //Five fields that need to be displayed
+        private final TextView articleTitleTextView;
+        private final TextView articleAuthorTextView;
+        private final TextView articleDateTextView;
+        private final TextView articleDescriptionTextView;
+        private final ImageView articleImageImageView;
+
+        //Constructor for the initialization of the above pieces
+        //A click listener is used to track the clicks
+        public ArticleAdapterItemHolder(View itemView) {
+            super(itemView);
+            articleTitleTextView=(TextView) itemView.findViewById(R.id.news_title_text_view);
+            articleAuthorTextView=(TextView) itemView.findViewById(R.id.news_author_text_view);
+            articleDateTextView=(TextView) itemView.findViewById(R.id.news_date_text_view);
+            articleDescriptionTextView=(TextView) itemView.findViewById(R.id.news_description_text_view);
+            articleImageImageView=(ImageView) itemView.findViewById(R.id.image_image_view);
+            itemView.setOnClickListener(this);
+        }
+
+        //Sets what goes into the views
+        //Gets info from the cursor, which gets info from the database
+        public void bind(int position){
+            cursor.moveToPosition(position);
+            articleTitleTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TITLE)));
+            articleAuthorTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_AUTHOR)));
+            articleDateTextView.setText(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PUBLISHED)));
+            String imgUrl=cursor.getString(cursor.getColumnIndex(COLUMN_NAME_IMG_URL));
+            if(imgUrl != null){
+                Picasso.with(context).load(imgUrl).into(articleImageImageView);
+            }
+        }
+
+        //Gets the location of the item that was clicked to return the correct info
+        @Override
+        public void onClick(View view) {
+            int pos=getAdapterPosition();
+            listener.onItemClick(pos);
+        }
     }
 }
