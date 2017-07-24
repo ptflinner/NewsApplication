@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class SchedulerUtil {
-    private static final int SCHEDULE_INTERVAL_MINUTES=360;
+    private static final int SCHEDULE_INTERVAL_MINUTES=60;
     private static final int SYNC_FLEXTIME_SECONDS=60;
     private static final String JOB_TAG="news_job_tag";
 
@@ -40,7 +40,7 @@ public class SchedulerUtil {
                 .setConstraints(Constraint.ON_ANY_NETWORK)
                 .setLifetime(Lifetime.FOREVER)
                 .setRecurring(true)
-                .setTrigger(Trigger.executionWindow(SCHEDULE_INTERVAL_MINUTES,SCHEDULE_INTERVAL_MINUTES+SYNC_FLEXTIME_SECONDS))
+                .setTrigger(Trigger.executionWindow(SCHEDULE_INTERVAL_MINUTES,SCHEDULE_INTERVAL_MINUTES))
                 .setReplaceCurrent(true)
                 .build();
 

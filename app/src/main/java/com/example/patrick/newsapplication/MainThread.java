@@ -150,7 +150,7 @@ public class MainThread extends AppCompatActivity  implements LoaderManager.Load
     //it draws info from the database and sends it to the adapter
     @Override
     public void onLoadFinished(Loader<Void> loader, Void data) {
-        loadingProgressBar.setVisibility(View.GONE);
+        loadingProgressBar.setVisibility(View.INVISIBLE);
         db=new DBHelper(MainThread.this).getReadableDatabase();
         cursor=DBUtils.getAll(db);
 
