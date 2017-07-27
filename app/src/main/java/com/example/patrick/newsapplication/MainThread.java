@@ -72,7 +72,7 @@ public class MainThread extends AppCompatActivity  implements LoaderManager.Load
             editor.commit();
         }
 
-        //Begins the scheduling of the
+        //Schedules the updates for the app
         SchedulerUtil.scheduleRefresh(this);
     }
 
@@ -107,7 +107,7 @@ public class MainThread extends AppCompatActivity  implements LoaderManager.Load
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemThatWasClickedId = item.getItemId();
-        if (itemThatWasClickedId == R.id.search) {
+        if (itemThatWasClickedId == R.id.refresh) {
             load();
         }
         return true;
@@ -131,13 +131,14 @@ public class MainThread extends AppCompatActivity  implements LoaderManager.Load
     public Loader<Void> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<Void>(this) {
 
-            //
+            //Loader starts and shows that the screen is refreshing by enabling progressbar
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
                 loadingProgressBar.setVisibility(View.VISIBLE);
             }
 
+            //Runs internet refresh off the UI thread
             @Override
             public Void loadInBackground() {
                 RefreshUtil.refreshArticles(MainThread.this);
@@ -150,7 +151,7 @@ public class MainThread extends AppCompatActivity  implements LoaderManager.Load
     //it draws info from the database and sends it to the adapter
     @Override
     public void onLoadFinished(Loader<Void> loader, Void data) {
-        loadingProgressBar.setVisibility(View.INVISIBLE);
+        loadingProgressBar.setVisibility(View.GONE);
         db=new DBHelper(MainThread.this).getReadableDatabase();
         cursor=DBUtils.getAll(db);
 
